@@ -4,11 +4,11 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="by.saburov.entities.OrderService">
+    <bean class="by.saburov.entities.OrderService" scope="customScope">
         <constructor-arg ref="orderValidator1"/>
     </bean>
-    <bean id="orderValidator1" class="by.saburov.entities.OrderValidator" autowire="constructor"/>
-    <bean id="ntsv" class="by.saburov.entities.NonThreadSafeValidator" scope="prototype"/>
+    <bean id="orderValidator1" class="by.saburov.entities.OrderValidator" autowire="constructor" scope="customScope"/>
+    <bean id="ntsv" class="by.saburov.entities.NonThreadSafeValidator" scope="customScope"/> <!-- was prototype scope-->
 
 
 </beans>

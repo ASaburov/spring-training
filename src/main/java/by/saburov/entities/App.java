@@ -14,21 +14,20 @@ public class App {
         GenericApplicationContext applicationContext = new GenericApplicationContext();
         new XmlBeanDefinitionReader(applicationContext).loadBeanDefinitions("app.xml");
         applicationContext.getBeanFactory().registerScope("thread", new SimpleThreadScope());
+        applicationContext.getBeanFactory().registerScope("customScope", new CustomScope());
         applicationContext.refresh();
-
 
         OrderService orderService = applicationContext.getBean(OrderService.class);
         orderService.createOrder(new Order(456));
-        orderService.createOrder(new Order(457));
-//        applicationContext.getBean(OrderService.class);
-//        applicationContext.getBean(OrderService.class);
-//        applicationContext.getBean(OrderService.class);
-//        new Thread(()->{
-//            applicationContext.getBean(OrderService.class);
-//        }).start();
-//        new Thread(()->{
-//            applicationContext.getBean(OrderService.class);
-//        }).start();
-//        orderService.createOrder(new Order(123));
+
+        try {
+            System.out.println("Waiting..");
+            Thread.sleep(5000);
+            System.out.println("Ready");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        OrderService orderService1 = applicationContext.getBean(OrderService.class);
+        orderService1.createOrder(new Order(457));
     }
 }
