@@ -3,9 +3,12 @@ package by.saburov.entities;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
 
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CustomScope implements Scope {
@@ -14,14 +17,19 @@ public class CustomScope implements Scope {
             = Collections.synchronizedMap(new HashMap<String, Object>());
     private Map<String, Runnable> destructionCallbacks
             = Collections.synchronizedMap(new HashMap<String, Runnable>());
+    private LocalTime timeLimit;
 
     public CustomScope() {
-        waitAndRemoveBeans();
+        setTimeLimit();
     }
 
 
     @Override
     public Object get(String name, ObjectFactory<?> objectFactory) {
+        if(checkTime()){
+            scopedObjects.clear();
+        }
+
         if(!scopedObjects.containsKey(name)) {
             scopedObjects.put(name, objectFactory.getObject());
             System.out.println("There is no " + name + " bean in the scope. Creating the new one");
@@ -50,19 +58,16 @@ public class CustomScope implements Scope {
         return null;
     }
 
-    public void waitAndRemoveBeans(){
-        new Thread(()->{
-            for(int i=0; i<4;){
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                i++;
-            }
-            scopedObjects.clear();
-            System.out.println("All beans are removed");
-        }).start();
+
+    public void setTimeLimit(){
+        LocalTime current = LocalTime.now();
+        timeLimit = current.plusSeconds(3);
     }
+
+    public boolean checkTime(){
+        LocalTime current = LocalTime.now();
+        return current.isAfter(timeLimit);
+    }
+
 
 }
